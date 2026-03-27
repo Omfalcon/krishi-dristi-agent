@@ -1,0 +1,132 @@
+=== KRISHI DRISTI TOOL TESTS ===
+
+--- Testing yield_prediction_internal ---
+Description: Predicts the most suitable crop using internal environmental data. Does NOT require any user input. Use this when crop recommendation is needed based on current conditions.
+Test Args: {'crop': 'rice', 'area': 1.5, 'season': 'Kharif'}
+Status: SUCCESS
+Result:
+❌ Error during crop prediction: [Errno 2] No such file or directory: 'C:\\Users\\hp\\PycharmProjects\\krishi-dristi-agent\\backend\\app\\models\\india_crop_yield_model.pkl'
+
+==================================================
+
+--- Testing crop_recommendation_internal ---
+Description: Recommends the best crop to plant based on internal sensor data (NPK, pH, and climate). Does NOT require user input. Use this for real-time soil and climate-based crop suggestions.
+Test Args: {'soil_type': 'alluvial', 'budget': 'medium'}
+Status: SUCCESS
+Result:
+🌱 **Crop Recommendation Analysis**:
+----------------------------------
+📍 **Soil Stats**: N:90, P:42, K:43 | pH: 6.5
+🌦️ **Climate**: 20.8°C | 82.0% Humidity | 202.9mm Rain
+
+✅ **Suggested Crop**: RICE
+📊 **Model Confidence**: 81.15%
+
+==================================================
+
+--- Testing fertilizer_prediction_internal ---
+Description: Predicts the most suitable fertilizer using internal farm data such as temperature, humidity, soil type, crop type, and nutrient levels. Does NOT require user input.
+Test Args: {'crop': 'wheat', 'soil_type': 'loamy'}
+Status: SUCCESS
+Result:
+❌ Error during fertilizer prediction: [Errno 2] No such file or directory: 'C:\\Users\\hp\\PycharmProjects\\krishi-dristi-agent\\backend\\app\\models\\fertilizer_bundle.pkl'
+
+==================================================
+
+--- Testing rainfall_prediction_internal ---
+Description: Provides rainfall data using internally stored location coordinates. Does NOT require user input. Use this when rainfall information is needed for current conditions.
+Test Args: {'location': 'Pune', 'month': 'July'}
+Status: SUCCESS
+Result:
+🌧️ Rainfall Analysis:
+- Location Coordinates: (28.6139, 77.209)
+
+👉 Estimated Rainfall: Nearest District: NEW DELHI
+Month: MAR
+Rainfall: 15.3 mm
+
+==================================================
+
+--- Testing weather_data_internal ---
+Description: Fetches weather information (temperature, humidity, etc.) for the farmer's location. Does NOT require user input. Use this when current weather conditions are needed.
+Test Args: {'location': 'Nagpur'}
+Status: SUCCESS
+Result:
+🌤️ Weather Report:
+- Location: (28.6139, 77.209)
+
+👉 Weather Details:
+{'coord': {'lon': 77.21, 'lat': 28.61}, 'weather': [{'id': 721, 'main': 'Haze', 'description': 'haze', 'icon': '50n'}], 'base': 'stations', 'main': {'temp': 23.06, 'feels_like': 22.99, 'temp_min': 23.06, 'temp_max': 23.06, 'pressure': 1006, 'humidity': 60, 'sea_level': 1006, 'grnd_level': 980}, 'visibility': 4000, 'wind': {'speed': 1.54, 'deg': 230}, 'clouds': {'all': 6}, 'dt': 1774648899, 'sys': {'type': 1, 'id': 9165, 'country': 'IN', 'sunrise': 1774658770, 'sunset': 1774703178}, 'timezone': 19800, 'id': 1260877, 'name': 'Parliament House, Delhi', 'cod': 200}
+
+==================================================
+
+--- Testing soil_data_internal ---
+Description: Fetches soil data for the farmer's location including temperature and moisture levels. Does NOT require user input. Use this when soil conditions are needed for farming decisions.
+Test Args: {'location': 'Nashik'}
+Status: SUCCESS
+Result:
+🌱 Soil Data Analysis:
+- Time (UTC): 1774612800
+- Surface Temperature (t0): 294.151 K
+- Temperature at 10cm Depth (t10): 293.15 K
+- Soil Moisture: 0.17 m³/m³
+
+==================================================
+
+--- Testing external_knowledge_search ---
+Description: Use this tool ONLY for external, recent, or general knowledge queries that are not covered by internal farming tools.
+
+⚠️ STRICT RULES:
+- DO NOT use for crop, fertilizer, soil, or weather queries
+- Use only as a LAST RESORT
+- Returns concise and relevant search results
+Test Args: {'query': 'latest farming techniques for cotton'}
+Status: SUCCESS
+Result:
+Could not connect to the local SearXNG server.
+
+==================================================
+
+--- Testing farming_practice_advisor ---
+Description: Provides farming advice such as irrigation methods, pest control, soil management, and best agricultural practices. Responds in the user's language using farmer-friendly explanations.
+Test Args: {'user_query': 'how to control pests in sugarcane'}
+Status: SUCCESS
+Result:
+I have checked the farming knowledge provided, but it does not have specific information on controlling pests in sugarcane.
+
+However, here is some general pest management advice from the context that you can use:
+
+### **Using Bio-Pesticide (EM-5) for Pest Control**
+
+This method uses effective microorganisms to control pests. It is a natural and safe way to protect your crops.
+
+**What you will need:**
+*   100 ml Effective Microorganisms (EM)
+*   100 ml natural vinegar
+*   100 ml wine or brandy
+*   100 g jaggery
+*   600 ml water
+*   Garlic and chili paste (optional, to make it stronger)
+
+**Step-by-Step Instructions:**
+
+1.  **Mix the ingredients:** In a container, mix the 100 ml EM, 100 ml vinegar, and 100 ml wine or brandy.
+2.  **Add the fermenter:** Add 100 g of jaggery and 600 ml of water to the mixture.
+3.  **Add potency (optional):** To make the spray more effective against pests, add a paste of garlic and chili.
+4.  **Ferment:** Keep the container in a cool, dark place for 7 days. Stir it once a day.
+5.  **Dilute and Spray:** After 7 days, dilute the fermented liquid with water at a ratio of 1 part spray to 1000 parts water.
+6.  **Application:** Spray this mixture on the leaves of your crops as a foliar spray. This helps control pests.
+
+**Important Note:** The context also mentions that for pests like aphids and mites, specific chemical sprays are used. It is important to correctly identify the pest in your sugarcane field and use the right control method. The bio-pesticide above is a general, safe option.
+
+==================================================
+
+--- Testing government_scheme_rag ---
+Description: Use this tool to answer questions about Indian government agricultural schemes. It provides details like eligibility, benefits, and application process. Works in multiple Indian languages.
+Test Args: {'user_query': 'subsidy for drip irrigation'}
+Status: SUCCESS
+Result:
+Based on the provided government data context, there is no information available regarding a subsidy for drip irrigation.
+
+==================================================
+

@@ -64,10 +64,10 @@ def predict_crop(model_weights , n, p, k, temp, hum, ph, rain):
     prediction = model.predict(input_data)
     
     # 4. (Optional) Get probabilities to see how "sure" the model is
-    # probabilities = model.predict_proba(input_data)
-    # confidence = max(probabilities[0])
+    probabilities = model.predict_proba(input_data)
+    confidence = max(probabilities[0])
     
-    return prediction[0]
+    return prediction[0], confidence
 
 
 

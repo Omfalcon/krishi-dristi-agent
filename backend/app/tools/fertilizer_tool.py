@@ -31,6 +31,7 @@
 
 from typing import Type
 from pydantic import BaseModel
+from pathlib import Path
 
 from langchain.tools import BaseTool
 from app.models.loader import predict_fertilizer
@@ -63,7 +64,7 @@ class FertilizerPredictionTool(BaseTool):
             "Phosphorous": 21,
         }
 
-        weights_path = "app/models/fertilizer_bundle.pkl"
+        weights_path = str(Path(__file__).resolve().parent.parent / "models" / "fertilizer_bundle.pkl")
 
         try:
             prediction = predict_fertilizer(weights_path, sample_input)

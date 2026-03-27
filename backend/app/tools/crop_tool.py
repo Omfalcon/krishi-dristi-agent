@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Type
 from pydantic import BaseModel
 from langchain.tools import BaseTool
+from pathlib import Path
 from app.models.loader import predict_crop  # ✅ Using your requested import
 
 # ✅ Empty schema (matches your internal data pattern)
@@ -28,12 +29,12 @@ class CropRecommendationInternalTool(BaseTool):
         rain = 202.9
 
         # Path to the pipeline we just saved (the .pkl file)
-        model_path = "app/models/crop_prediction_model.pkl"
+        model_path = str(Path(__file__).resolve().parent.parent / "models" / "crop_prediction_model.pkl")
 
         try:
             # ✅ Using your specific loader function
-            # This function likely returns the label (e.g., 'rice')
-            # and potentially the confidence score
+            # This function now returns the label (e.g., 'rice')
+            # and the confidence score (float)
             prediction, confidence = predict_crop(
                 model_path,
                 n, p, k, 
@@ -46,7 +47,7 @@ class CropRecommendationInternalTool(BaseTool):
                 f"📍 **Soil Stats**: N:{n}, P:{p}, K:{k} | pH: {ph}\n"
                 f"🌦️ **Climate**: {temp}°C | {hum}% Humidity | {rain}mm Rain\n\n"
                 f"✅ **Suggested Crop**: {prediction.upper()}\n"
-                f"📊 **Model Confidence**: {confidence:.2f}%"
+                f"📊 **Model Confidence**: {confidence * 100:.2f}%"
             )
 
         except Exception as e:

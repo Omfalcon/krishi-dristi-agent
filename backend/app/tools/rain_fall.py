@@ -18,6 +18,7 @@
 
 from typing import Type
 from pydantic import BaseModel
+from pathlib import Path
 
 from langchain.tools import BaseTool
 from app.services.rainfall_service import get_rainfall_data
@@ -39,7 +40,7 @@ class RainfallPredictionTool(BaseTool):
 
     def _run(self) -> str:
         # ✅ Hardcoded internal data
-        csv_file = "app/data/rain_fall_distribution.csv"
+        csv_file = str(Path(__file__).resolve().parent.parent / "data" / "rain_fall_distribution.csv")
         coordinates = (28.6139, 77.2090)  # Example: Delhi
 
         try:

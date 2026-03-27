@@ -34,6 +34,7 @@
 
 from typing import Type
 from pydantic import BaseModel
+from pathlib import Path
 
 from langchain.tools import BaseTool
 from app.models.loader import predict_yield_simple
@@ -60,7 +61,7 @@ class YieldPredictionInternalTool(BaseTool):
         crop_name = "Rice, paddy"
         current_pesticide = 1.5
 
-        weights_path = "app/models/india_crop_yield_model.pkl"
+        weights_path = str(Path(__file__).resolve().parent.parent / "models" / "india_crop_yield_model.pkl")
 
         try:
             prediction = predict_yield_simple(

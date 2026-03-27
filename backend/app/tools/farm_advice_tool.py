@@ -73,7 +73,7 @@ def get_llm():
     return ChatOpenAI(
         api_key=os.getenv("SARVAM_MODEL_API"),
         base_url="https://api.sarvam.ai/v1",
-        model=os.getenv("SARVAM30_MODEL_NAME"),
+        model=os.getenv("SARVAM105_MODEL_NAME"),
         temperature=0.3
     )
 
