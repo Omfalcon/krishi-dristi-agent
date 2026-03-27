@@ -43,7 +43,7 @@ class CropRecommendationInternalTool(BaseTool):
 
             return (
                 "🌱 **Crop Recommendation Analysis**:\n"
-                "----------------------------------\n"
+                "---------------------------------\n"
                 f"📍 **Soil Stats**: N:{n}, P:{p}, K:{k} | pH: {ph}\n"
                 f"🌦️ **Climate**: {temp}°C | {hum}% Humidity | {rain}mm Rain\n\n"
                 f"✅ **Suggested Crop**: {prediction.upper()}\n"
