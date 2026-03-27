@@ -27,26 +27,71 @@
 #     lon = 244.5
 #     return get_weather_data(lat, lon, [option])
 
-from langchain.tools import tool
-from app.services.weather_service import get_weather_data 
 
 
-@tool
-def get_weather_info() -> str:
-    """
-    Use this tool to get weather information for the farmer's location.
-    Do NOT ask the user for weather parameters. Location is handled internally.
-    """
 
-    # ✅ Replace with dynamic location later
-    lat = 28.6139
-    lon = 77.2090
+# from langchain.tools import tool
+# from app.services.weather_service import get_weather_data 
 
 
-    try:
-        data = get_weather_data(lat, lon)
-        return data
-    except Exception as e:
-        return f"Unable to fetch weather data right now."
+# @tool
+# def get_weather_info() -> str:
+#     """
+#     Use this tool to get weather information for the farmer's location.
+#     Do NOT ask the user for weather parameters. Location is handled internally.
+#     """
 
-print(get_weather_info())
+#     # ✅ Replace with dynamic location later
+#     lat = 28.6139
+#     lon = 77.2090
+
+
+#     try:
+#         data = get_weather_data(lat, lon)
+#         return data
+#     except Exception as e:
+#         return f"Unable to fetch weather data right now."
+
+# print(get_weather_info())
+
+
+from typing import Type
+from pydantic import BaseModel
+
+from langchain.tools import BaseTool
+from app.services.weather_service import get_weather_data
+
+
+# ✅ Empty schema (no user input required)
+class EmptyInput(BaseModel):
+    pass
+
+
+class WeatherInfoTool(BaseTool):
+    name: str = "weather_data_internal"
+    description: str = (
+        "Fetches weather information (temperature, humidity, etc.) for the farmer's location. "
+        "Does NOT require user input. "
+        "Use this when current weather conditions are needed."
+    )
+    args_schema: Type[BaseModel] = EmptyInput
+
+    def _run(self) -> str:
+        # ✅ Hardcoded location (can replace later)
+        lat = 28.6139
+        lon = 77.2090
+
+        try:
+            data = get_weather_data(lat, lon)
+
+            return (
+                "🌤️ Weather Report:\n"
+                f"- Location: ({lat}, {lon})\n\n"
+                f"👉 Weather Details:\n{data}"
+            )
+
+        except Exception as e:
+            return f"❌ Unable to fetch weather data: {str(e)}"
+
+    async def _arun(self, *args, **kwargs):
+        raise NotImplementedError("Async not implemented")

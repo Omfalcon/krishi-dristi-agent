@@ -1,18 +1,19 @@
 import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.tools import tool
-from langchain.messages import HumanMessage
 from langchain.agents import create_agent
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_ollama import ChatOllama
-from app.tools.crop_tool import get_crop_prediction
-from app.tools.fertilizer_tool import get_fertilizer_prediction
-from app.tools.rain_fall import get_rainfall_prediction
-from app.tools.weather_tool import get_weather_info
-from app.tools.soil_tool import get_soil_info
-from app.tools.general_info_tool import search_external_knowledge
+from app.tools.crop_tool import CropPredictionInternalTool
+from app.tools.fertilizer_tool import FertilizerPredictionTool
+from app.tools.rain_fall import RainfallPredictionTool
+from app.tools.weather_tool import WeatherInfoTool
+from app.tools.soil_tool import SoilInfoTool
+from app.tools.general_info_tool import ExternalKnowledgeSearchTool
+from app.tools.farm_advice_tool import FarmPracticeRAGTool
+from app.tools.goverment_schema_tool import GovSchemeRAGTool
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.messages import SystemMessage, HumanMessage
 
 
 load_dotenv()
@@ -30,7 +31,19 @@ load_dotenv()
 #     """Automatically returns current weather for the farmer's region."""
 #     return "The weather in Maharashtra is 28°C with high humidity."
 
-TOOLS = [get_crop_prediction, get_fertilizer_prediction , get_rainfall_prediction , get_weather_info , get_soil_info, search_external_knowledge]
+
+TOOLS = [
+    CropPredictionInternalTool(),
+    FertilizerPredictionTool(),
+    RainfallPredictionTool(),
+    WeatherInfoTool(),
+    SoilInfoTool(),
+    ExternalKnowledgeSearchTool(),
+    FarmPracticeRAGTool(),
+    GovSchemeRAGTool()
+]
+
+
 
 # -----------------------------
 # SARVAM LLM SETUP
@@ -38,7 +51,6 @@ TOOLS = [get_crop_prediction, get_fertilizer_prediction , get_rainfall_predictio
 ### for online commnication 
 def get_sarvam_llm(model_name: str = "sarvam-30b") -> ChatOpenAI:
     api_key = os.getenv("SARVAM_MODEL_API")
-    model_name = os.getenv("SARVAM105_MODEL_NAME")
     if not api_key:
         raise ValueError("SARVAM_MODEL_API environment variable not set.")
     return ChatOpenAI(
@@ -48,8 +60,9 @@ def get_sarvam_llm(model_name: str = "sarvam-30b") -> ChatOpenAI:
         temperature=0.0
     )
 
-def get_gemini_llm(moddel_name: str = "gemini-1.5-pro"):
-    return ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0.0)
+
+def get_gemini_llm(model_name: str = "gemini-1.5-pro"):
+    return ChatGoogleGenerativeAI(model=model_name, temperature=0.0)
 
 
 
@@ -63,50 +76,52 @@ def get_ollama_llm(model_name: str = "llama3"):
 
 
 # -----------------------------
-# DYNAMIC SYSTEM PROMPT
-# -----------------------------
-
-# -----------------------------
 # SYSTEM PROMPT
 # -----------------------------
-# def get_system_prompt(expertise_level: str = "beginner") -> str:
-#     base = (
-#         "You are an expert Indian Agriculture Advisor. "
-#         "Use the available tools automatically to answer farmer queries. "
-#         "Always reply in the same language as the user's latest message. "
-#         "If the user writes in Hindi, reply in Hindi. "
-#         "If the user writes in Tamil, reply in Tamil. "
-#         "If the user writes in English, reply in English. "
-#         "If tool results are in English, convert them into the user's language in the final response. "
-#         "Preserve crop names, fertilizer names, chemical names, numbers, units, place names, and temperatures accurately. "
-#         "Keep the reply practical, simple, and farmer-friendly. "
-#         "Do not ask unnecessary follow-up questions."
-#     )
-#     if expertise_level == "beginner":
-#         return f"{base} Explain in very simple language."
-#     return base
 
-# def get_system_prompt(expertise_level: str = "beginner") -> str:
+# def get_agent_system_prompt(expertise_level: str = "beginner") -> str:
 #     base = (
 #         "You are an expert Indian Agriculture Advisor. "
-#         "Use the available tools automatically to answer farmer queries."
+#         "You MUST use the provided tools to answer questions. "
+#         "Do NOT answer from your own knowledge if a tool is available. "
+#         "Always return the tool output as the main answer. "
+#         "Do NOT ask follow-up questions. "
+#         "Keep the answer simple and farmer-friendly. "
+#         "Reply in the same language as the user."
 #     )
-#     if expertise_level == "beginner":
-#         return f"{base} Explain in simple language without asking for extra input."
 #     return base
 
 
-def get_system_prompt(expertise_level: str = "beginner") -> str:
-    base = (
-        "You are an expert Indian Agriculture Advisor. "
-        "You MUST use the provided tools to answer questions. "
-        "Do NOT answer from your own knowledge if a tool is available. "
-        "Always return the tool output as the main answer. "
-        "Do NOT ask follow-up questions. "
-        "Keep the answer simple and farmer-friendly. "
-        "Reply in the same language as the user."
+def get_agent_system_prompt(expertise_level: str = "beginner") -> str:
+    return (
+        "You are an expert Indian Agriculture Advisor.\n\n"
+        "GUIDELINES:\n"
+        "- Use tools whenever they are relevant.\n"
+        "- Prefer tools for accurate and real-time information.\n"
+        "- If no tool is suitable, answer using your knowledge.\n"
+        "- Do NOT make up tool outputs.\n"
+        "- Keep answers simple and farmer-friendly.\n"
+        "- Reply in the same language as the user.\n"
     )
-    return base
+
+
+def get_chat_system_prompt(expertise_level: str = "beginner") -> str:
+    return (
+        "You are 'Krishi Sahayak', a dedicated Indian Agriculture Advisor. "
+        "Your goal is to support Indian farmers with empathy, respect, and local wisdom.\n\n"
+        
+        "CONTEXT & GUIDELINES:\n"
+        "1. LANGUAGE: Always respond in the EXACT same language or dialect the farmer uses (Hindi, Marathi, Tamil, etc.). "
+        "Use simple, conversational words, not technical jargon.\n"
+        
+        "2. CULTURAL TONE: Use respectful Indian greetings (like 'Namaste', 'Ram Ram', or 'Vanakkam') where appropriate. "
+        "Be encouraging—farming is hard work, and you are their digital partner.\n"
+        
+        "3. KNOWLEDGE SCOPE: You are an expert in Indian crop cycles (Kharif, Rabi, Zaid). "
+        "If a farmer asks a general question, provide advice relevant to Indian geography and climate.\n"
+        
+        "4. BREVITY: Keep responses short and punchy. Farmers often read this on mobile screens in the field."
+    )
 
 
 # -----------------------------
@@ -116,10 +131,52 @@ def create_farmer_agent(llm: ChatOpenAI, checkpointer: SqliteSaver):
     return create_agent(
         model=llm,
         tools=TOOLS,
-        system_prompt=get_system_prompt("beginner"),
+        system_prompt=get_agent_system_prompt("beginner"),
         checkpointer=checkpointer,
         debug=True
     )
+
+
+# def call_chat_only(llm, user_query: str, config: dict, checkpointer: SqliteSaver):
+#     """
+#     Handles simple conversation while manually syncing with the 
+#     same SQLite memory used by the Agent.
+#     """
+#     # Fetch existing history for this thread
+#     state = checkpointer.get(config)
+#     history = state.values.get("messages", []) if state else []
+    
+#     # Build message list: System + History + Current Query
+#     messages = [SystemMessage(content=get_chat_system_prompt())]
+#     messages.extend(history)
+#     messages.append(HumanMessage(content=user_query))
+    
+#     # Execute LLM call
+#     response = llm.invoke(messages)
+    
+#     # Update SQLite state manually to keep memory consistent
+#     new_history = history + [HumanMessage(content=user_query), response]
+#     checkpointer.put(config, {"messages": new_history})
+    
+#     return response.content
+
+
+def call_chat_only(llm, user_query: str, config: dict, checkpointer):
+    """
+    Handles simple conversation using checkpointer-safe flow.
+    """
+
+    state = checkpointer.get(config)
+    history = state.values.get("messages", []) if state else []
+
+    messages = [SystemMessage(content=get_chat_system_prompt())]
+    messages.extend(history)
+    messages.append(HumanMessage(content=user_query))
+
+    response = llm.invoke(messages)
+
+
+    return response.content
 
 
 # -----------------------------
@@ -162,3 +219,5 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"❌ Error: {e}\n")
+
+
