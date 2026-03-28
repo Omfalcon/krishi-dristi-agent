@@ -11,7 +11,7 @@ def get_disaster_alert(payload: DisasterRequest):
     try:
         data = get_latest_disaster(payload.lat, payload.lng)
 
-        results = data.get("result", [])
+        results = data
 
         events = [
             DisasterEvent(
