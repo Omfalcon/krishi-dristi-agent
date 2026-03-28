@@ -6,15 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="5fd3a653-ac54-4db0-9419-bd707710f00f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/api/v1/endpoints/chat.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/v1/endpoints/chat.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/core/user_context.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/user_context.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/data/farmer_data.db-shm" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/data/farmer_data.db-shm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/data/farmer_data.db-wal" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/data/farmer_data.db-wal" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/data/weather_cache.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/data/weather_cache.sqlite" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/services/npk_ph_level.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/npk_ph_level.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/tools/crop_tool.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/tools/crop_tool.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/tools/fertilizer_tool.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/tools/fertilizer_tool.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/tools/yield_tool.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/tools/yield_tool.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/data/weather_cache.sqlite" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +88,7 @@
       <workItem from="1774549416499" duration="5131000" />
       <workItem from="1774558824895" duration="13745000" />
       <workItem from="1774649158742" duration="21847000" />
-      <workItem from="1774713330490" duration="3898000" />
+      <workItem from="1774713330490" duration="4918000" />
     </task>
     <servers />
   </component>
