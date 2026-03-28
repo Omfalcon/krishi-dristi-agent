@@ -1,16 +1,16 @@
-// src/main.jsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+// src/main.jsx  — wrap your existing providers with AuthProvider
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
-import './index.css'
-
-// ✅ Import AppProvider
 import { AppProvider } from './context/AppContext.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'   // ← add this
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
     <AppProvider>
-      <App />
+      <AuthProvider>          {/* ← wrap App */}
+        <App />
+      </AuthProvider>
     </AppProvider>
-  </React.StrictMode>
+  </StrictMode>,
 )
