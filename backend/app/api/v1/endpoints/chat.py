@@ -171,6 +171,9 @@ class ChatResponse(BaseModel):
     reply: str
     username: str
 
+class ChatHistoryOut(BaseModel):
+    messages: list[dict]
+
 
 # ─────────────────────────────────────────────────────────────
 # ✅ MAIN CHAT ENDPOINT
@@ -193,6 +196,24 @@ def chat(body: ChatRequest, authorization: str = Header(...)):
             )
 
         reply = response["messages"][-1].content
+
+        # ✅ Persist ALL chat to MongoDB (Single document per user with messages array)
+        from app.db.session import get_db
+        from datetime import datetime
+        db = get_db()
+        db.chat_history.update_one(
+            {"username": username},
+            {
+                "$push": {
+                    "messages": {
+                        "user_message": body.message,
+                        "agent_reply": reply,
+                        "timestamp": datetime.utcnow()
+                    }
+                }
+            },
+            upsert=True
+        )
 
         return ChatResponse(reply=reply, username=username)
 
@@ -217,3 +238,29 @@ def chat(body: ChatRequest, authorization: str = Header(...)):
             status_code=500,
             detail=f"Agent error: {error_msg}"
         )
+
+
+@router.get("/history", response_model=ChatHistoryOut, summary="Retrieve chat history from MongoDB")
+def get_chat_history(authorization: str = Header(...)):
+    """Fetch all past user/agent interactions for this user."""
+    username = _get_username_from_token(authorization)
+    from app.db.session import get_db
+    db = get_db()
+    
+    doc = db.chat_history.find_one({"username": username})
+    
+    history = []
+    if doc and "messages" in doc:
+        for m in doc["messages"]:
+            history.append({
+                "role": "user",
+                "content": m["user_message"],
+                "timestamp": m["timestamp"]
+            })
+            history.append({
+                "role": "assistant",
+                "content": m["agent_reply"],
+                "timestamp": m["timestamp"]
+            })
+    
+    return ChatHistoryOut(messages=history)

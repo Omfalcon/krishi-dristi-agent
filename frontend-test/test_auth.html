@@ -322,6 +322,7 @@
             <button class="step-btn active" id="stepBtn1">1 · Login</button>
             <button class="step-btn" id="stepBtn2">2 · Location</button>
             <button class="step-btn" id="stepBtn3">3 · Chat</button>
+            <button class="step-btn" onclick="doLogout()" style="cursor:pointer; color:#721c24">Logout</button>
         </div>
 
         <!-- ── STEP 1: Auth ─────────────────────────────────────────── -->
@@ -394,8 +395,17 @@
     <script>
         const API = 'http://localhost:8000/api/v1';
 
-        let token = null;
-        let username = null;
+        let token = localStorage.getItem('token');
+        let username = localStorage.getItem('username');
+
+        // On load, if token exists, try to skip to location or chat
+        window.addEventListener('load', () => {
+            if (token && username) {
+                document.getElementById('userBadge2').textContent = '👤 ' + username;
+                document.getElementById('userBadge3').textContent = '👤 ' + username;
+                goToStep(2);
+            }
+        });
 
         // ── Helpers ──────────────────────────────────────────────────
         function showAlert(panelNum, msg, type = 'error') {
@@ -427,6 +437,11 @@
             hideAlert(1);
         }
 
+        function doLogout() {
+            localStorage.clear();
+            location.reload();
+        }
+
         // ── Step 1: Auth ─────────────────────────────────────────────
         async function doLogin() {
             const user = document.getElementById('loginUser').value.trim();
@@ -444,6 +459,8 @@
             if (res.ok) {
                 token = data.access_token;
                 username = data.user.username;
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', username);
                 document.getElementById('userBadge2').textContent = '👤 ' + username;
                 document.getElementById('userBadge3').textContent = '👤 ' + username;
                 goToStep(2);
@@ -510,9 +527,33 @@
             const data = await res.json();
 
             if (res.ok) {
+                await loadChatHistory();
                 goToStep(3);
             } else {
                 showAlert(2, '❌ ' + (data.detail || 'Failed to save location.'));
+            }
+        }
+
+        async function loadChatHistory() {
+            try {
+                const res = await fetch(`${API}/chat/history`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) return;
+                
+                const data = await res.json();
+                const box = document.getElementById('chatBox');
+                // Clear existing initial message if there is history
+                if (data.messages && data.messages.length > 0) {
+                    box.innerHTML = '';
+                }
+                
+                data.messages.forEach(m => {
+                    addMessage(m.content, m.role === 'user' ? 'user' : 'agent');
+                });
+            } catch (e) {
+                console.error('Failed to load history:', e);
             }
         }
 
