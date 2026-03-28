@@ -17,6 +17,8 @@ import { useAuth } from './context/AuthContext.jsx'
 import useSpeechRecognition from './components/useSpeechRecognition'
 import { speakText } from './components/speakText'
 import AdvisoryTicker from './components/AdvisoryTicker.jsx'
+import SchemesListPage from './pages/SchemesListPage.jsx' 
+
 
 /* ── inline sub-components (no extra files needed) ── */
 
@@ -444,6 +446,7 @@ export default function App() {
   const [locationText, setLocationText] = useState('Dehradun, IN')
   const [isUpdatingLocation, setIsUpdatingLocation] = useState(false)
   const [weatherData, setWeatherData] = useState(null)
+  const [showSchemes, setShowSchemes] = useState(false)
 
   const sliderRef = useRef(null)
   const isUserScrolling = useRef(false)
@@ -628,7 +631,9 @@ export default function App() {
       }
     )
   }, [isAuthenticated, token, guardedAction])
-
+if (showSchemes) {
+  return <SchemesListPage onBack={() => setShowSchemes(false)} />
+}
   return (
     <>
       {/* inject keyframes once */}
@@ -807,7 +812,13 @@ export default function App() {
               <div className="card-top"><div className="card-label"><span className="card-dot dot-purple" />Government Scheme</div><span className="card-badge badge-scheme">🏛 New</span></div>
               <div className="card-metric-sm">PM Fasal Bima</div>
               <div className="card-desc">Enroll in Pradhan Mantri Fasal Bima Yojana before the season deadline to protect your crop.</div>
-              <div className="card-cta"><a href="https://pmfby.gov.in/" target="_blank" rel="noopener noreferrer" className="card-cta-btn">Apply Now →</a></div>
+              <div className="card-cta"><button
+  onClick={() => setShowSchemes(true)}
+  className="card-cta-btn"
+  style={{ cursor: 'pointer', border: 'none', background: 'none' }}
+>
+  View All Schemes →
+</button></div>
             </div>
           </div>
         </section>
