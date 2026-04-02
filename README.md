@@ -73,7 +73,9 @@ This system combines:
 
 ## 🧠 System Workflow & Architecture
 
-![Krishi Mitra Workflow](Frontend/public/image.png)
+![Krishi Mitra Workflow](![Uploading image.png…]()
+)
+![Uploading image.png…]()
 
 ---
 
