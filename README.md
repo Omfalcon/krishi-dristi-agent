@@ -73,10 +73,7 @@ This system combines:
 
 ## 🧠 System Workflow & Architecture
 
-![Krishi Mitra Workflow](![Uploading image.png…]()
-)
-![Uploading image.png…]()
-
+![Krishi Mitra Workflow]
 ---
 
 # 🖥 Frontend (React + Vite)
